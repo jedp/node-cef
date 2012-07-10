@@ -9,18 +9,30 @@
     {
       "name": "Yvan Boily",
       "email": "yvanboily@gmail.com"
-    } 
+    },
+    { 
+      "name": "Jed Parsons",
+      "url": "https://github.com/jedp"
+    }
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/ygjb/cef.git"
   },
   "keywords": [
-	"cef",
-	"syslog",
-	"syslogd",
-	"arcsight"
+    "cef",
+    "syslog",
+    "syslogd",
+    "arcsight"
   ],
+  "devDependencies": {
+    "request": "2.9.203",
+    "vows": "0.6.3"
+  },
+  "scripts": {
+    "test": "vows tests/test_*.js --spec"
+  },
+
   "license": "MPL",
   "engine": {
     "node": ">=0.6"
