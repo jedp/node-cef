@@ -29,11 +29,11 @@ var suite = vows.describe("Formatter")
       var formatter = new cef.Formatter();
       var f = formatter.sanitizeText;
       console.log("apply f: " + f("glug| merg"));
-      return f(f(f("I   | like pie = glug\r\n\r\r\n")));
+      return f(f(f("=I   | like pie = glug\r\n\r\r\n")));
     },
 
     "is idempotent": function(text) {
-      assert(text === "I   \\| like pie \\= glug\n");
+      assert(text === "\\=I   \\| like pie \\= glug\n");
     }
   },
 
@@ -43,7 +43,6 @@ var suite = vows.describe("Formatter")
     },
 
     "works on characters at string margins": function(text) {
-      console.log("became: " + text);
       assert(text === "\\|or else\\=");
     }
   },
