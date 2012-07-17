@@ -1,6 +1,6 @@
 var vows = require('vows');
 var assert = require('assert');
-var cef = require('../lib/CEF');
+var cef = require('../lib/cef');
 var util = require('util');
 
 var suite = vows.describe("Formatter")
@@ -21,6 +21,30 @@ var suite = vows.describe("Formatter")
 
     "backslashes": function(text) {
       assert(! /[^\\]\\[^|=]/.test(text));
+    }
+  },
+
+  "The text sanitizer": {
+    topic: function() {
+      var formatter = new cef.Formatter();
+      var f = formatter.sanitizeText;
+      console.log("apply f: " + f("glug| merg"));
+      return f(f(f("I   | like pie = glug\r\n\r\r\n")));
+    },
+
+    "is idempotent": function(text) {
+      assert(text === "I   \\| like pie \\= glug\n");
+    }
+  },
+
+  "The text sanitizer": {
+    topic: function() {
+      return (new cef.Formatter()).sanitizeText("|or else=");
+    },
+
+    "works on characters at string margins": function(text) {
+      console.log("became: " + text);
+      assert(text === "\\|or else\\=");
     }
   },
 
@@ -79,7 +103,6 @@ var suite = vows.describe("Formatter")
     },
 
     "stores default values": function(formatter) {
-      assert(formatter.cef_version === "0");
       assert(formatter.vendor === "Initech");
       assert(formatter.product === "Red Stapler");
       assert(formatter.version === "2");
