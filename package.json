@@ -2,7 +2,7 @@
   "name": "cef",
   "preferGlobal": "true",
   "version": "0.2.0",
-  "main" : "lib/CEF.js",
+  "main" : "lib/cef.js",
   "author": "Yvan Boily <yvanboily@gmail.com>",
   "description": "A naive CEF logging library.",
   "contributors": [ 
@@ -25,6 +25,9 @@
     "syslogd",
     "arcsight"
   ],
+  "dependencies": {
+    "posix": "0.0.8"
+  },
   "devDependencies": {
     "request": "2.9.203",
     "vows": "0.6.2"
