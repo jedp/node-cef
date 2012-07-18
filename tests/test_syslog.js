@@ -69,8 +69,8 @@ var suite = vows.describe("SysLog")
       server.bind(0);
     },
 
-    "contains facility/severity": function(string) {
-      assert(/^<\d+>/.test(string));
+    "contains the correct facility/severity": function(string) {
+      assert(/^<166>/.test(string));
     },
 
     "contains the date": function(string) {

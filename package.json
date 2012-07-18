@@ -1,10 +1,9 @@
 {
   "name": "cef",
-  "preferGlobal": "true",
   "version": "0.2.0",
   "main" : "lib/cef.js",
-  "author": "Yvan Boily <yvanboily@gmail.com>",
-  "description": "A naive CEF logging library.",
+  "author": "Jed Parsons <https://github.com/jedp>",
+  "description": "A very simple CEF-syslog module.",
   "contributors": [ 
     {
       "name": "Yvan Boily",
@@ -15,29 +14,34 @@
       "url": "https://github.com/jedp"
     }
   ],
+
   "repository": {
     "type": "git",
-    "url": "https://github.com/ygjb/cef.git"
+    "url": "https://github.com/jedp/node-cef.git"
   },
-  "keywords": [
-    "cef",
-    "syslog",
-    "syslogd",
-    "arcsight"
-  ],
+
   "dependencies": {
     "dateformat": "1.0.2-1.2.3"
   },
+
   "devDependencies": {
-    "request": "2.9.203",
     "vows": "0.6.2"
   },
+
   "scripts": {
     "test": "vows tests/test_*.js --spec"
   },
 
   "license": "MPL",
+
   "engine": {
     "node": ">=0.6"
-  }
+  },
+
+  "keywords": [
+    "cef",
+    "syslog",
+    "syslogd",
+    "arcsight"
+  ]
 }
