@@ -176,13 +176,13 @@ var suite = vows.describe("Formatter")
         var params = {
           name: "Low on staples",
           signature: "17",
-          severity: 6
+          severity: 6,
+          extensions: {
+            remaining: 32,
+            failAt: "15min 42sec"
+          }
         };
-        var options = {
-          remaining: 32,
-          failAt: "15min 42sec"
-        };
-        return formatter.format(params, options);
+        return formatter.format(params);
       },
 
       "produces a valid CEF string": function (err, result) {
