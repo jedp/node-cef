@@ -51,7 +51,15 @@ var suite = vows.describe("SysLog")
 
       // Log a message to it
       server.on('listening', function() {
-        new cef.Logger({syslog_port: server.address().port}).info({
+        var config = {
+          vendor: 'Foo',
+          product: 'bar',
+          version: '1.2.3',
+          syslog_port: server.address().port,
+          syslog_tag: 'night-kitchen',
+          syslog_facility: 'local4'
+        };
+        new cef.Logger(config).info({
           name: "I like pie",
           signature: 1234
         });
