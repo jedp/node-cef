@@ -7,6 +7,11 @@ that by default emits messages to the syslog over udp.  The syslogger
 is pluggable, so if the default does not fit your needs, you can
 change it.
 
+`node-cef` is intended to be used alongside other logging facilities.
+Note that it doesn't actually print anything to the console or any
+files by default; its sole purpose is to emit CEF strings to a syslog
+service.
+
 ## Installation
 
 ```
@@ -125,9 +130,43 @@ use four levels as follows:
 
 4. (`info`) Normal app activity.  Logins and various kinds of transactions.
 
-
-
 ## Syslog Transports
+
+By default, `node-cef` uses a udp syslog transport.  You can configure
+the transport with the following options to the `Logger` constructor:
+
+- `syslog_tag`: The name of your app to appear in the syslog.  Default
+  is `__filename`, which you probably want to change.
+
+- `syslog_facility`: One of the facility names or numbers as defined
+  in RFC 3164.  Default is `user`.
+
+- `syslog_address`: IP address of the syslog service.  Default is
+  `127.0.0.1`.
+
+- `syslog_port`: Port for the syslog service.  Default is `514`.
+
+- `syslog_transport`: A function taking two arguments: `message` and
+  `callback`.  By default, this is a udp4 transport using the address
+  and port described above.
+
+Within the transport function, address and port are available as
+`this.address` and `this.port`.  You could specify a transport using
+some custom service like so:
+
+```javascript
+{ syslog_address: '192.168.1.42',
+  syslog_port: 9876,
+  syslog_transport: function(message, callback) {
+    myCustomService.send(
+      new Buffer(message),
+      this.port,
+      this.address,
+      callback
+    );
+  }
+}
+```
 
 ## Contributors
 
