@@ -40,7 +40,7 @@ logger.info({signature: "Bflat", name: "Out of tune"});
 This will emit a message like the following to the system log:
 
 ```
-<161> Jul 18 02:16:12 my-piano[17016] CEF:0|Steinway|Piano|B|Bflat|Out of tune|4
+<166> Jul 18 02:16:12 my-piano[17016] CEF:0|Steinway|Piano|B|Bflat|Out of tune|4
 ```
 
 (I don't actually own a Steinway B, but I wish I did.)
@@ -119,17 +119,18 @@ We suggest you decide with your team on a set of meanings and stick
 with them.  For example, for logging BrowserID events at Mozilla, we
 use four levels as follows:
 
-- 10. (`emerg`) Completely out of whack.  Someone needs to look at
-    this.  Harm to the application, user account, or system security
-    could have taken place.
+- `emerg` (10) Completely out of whack.  Someone needs to look at
+   this.  Harm to the application, user account, or system security
+   could have taken place.
 
-- 8. (`alert`) Suspicious activity or application has non-validated user
-   input. Impact is not known.
+- `alert` (8) Suspicious activity or application has non-validated
+   user input. Impact is not known.
 
-- 6. (`warn`) Normal security application stuff, login failures,
+- `warn` (6) Normal security application stuff, login failures,
    password changes.
 
-- 4. (`info`) Normal app activity.  Logins and various kinds of transactions.
+- `info` (4) Normal app activity.  Logins and various kinds of
+  transactions.
 
 ## Syslog Transports
 
