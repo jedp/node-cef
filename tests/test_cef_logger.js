@@ -51,8 +51,8 @@ var suite = vows.describe("Logger")
         product: 'Piano',
         version: 'B',
         syslog_tag: 'test',
-        syslog_facility: 'user',
-        syslog_address: '127.0.0.1',
+        syslog_facility: 'local4',
+        syslog_address: '192.168.1.42',
         syslog_port: 32767,
         syslog_transport: dummyTransport
       };
@@ -65,8 +65,8 @@ var suite = vows.describe("Logger")
 
     "has a properly configured syslogger": function(logger) {
       assert(logger.syslog.tag === 'test');
-      assert(logger.syslog.facility === 1);
-      assert(logger.syslog.address === '127.0.0.1');
+      assert(logger.syslog.facility === 20);
+      assert(logger.syslog.address === '192.168.1.42');
       assert(logger.syslog.port === 32767);
       assert(logger.syslog.transport === dummyTransport);
     },
