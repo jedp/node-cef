@@ -1,22 +1,48 @@
-# cef - a CEF and Syslog Logging Library
+# node-cef: A CEF and Syslog Logging Library
 
-CEF is a proprietary format by Arcsight that details how to format messages for easy integration into Arcsights NSM products.  [Arcsight](http://www.arcsight.com/solutions/solutions-cef/) controls the standard, and it can be requested here.
+The Common Event Format, or CEF, is a [standard proposed by
+ArcSight](http://www.arcsight.com/collateral/CEFstandards.pdf) for
+logging event data.  This module provides a CEF formatter and logger
+that by default emits messages to the syslog over udp.  The syslogger
+is pluggable, so if the default does not fit your needs, you can
+change it.
 
-This is a basic library for implementing CEF logging using a simple API.  
+## Installation
 
-## Usage ##
+```
+npm install cef
+```
 
-Call:
+## Example
 
-cef.generateCEF(...) to generate a string that is formatted as a CEF log entry
+```javascript
+var cef = require('cef');
 
-or 
+// Create a configuration for your application and your syslog interface
+var config = {
+  vendor: 'Steinway',
+  product: 'Piano',
+  version: 'B',
+  syslog_tag: 'my-piano',
+  syslog_facility: 'local4'
+};
 
-cef.syslog(...) to generate that string and write it to syslog
+var logger = new cef.Logger(config);
 
-See [example.js](https://github.com/ygjb/cef/blob/master/example.js) for a detailed example on how to use the API.
+logger.info({signature: "Bflat", name: "Out of tune"});
+```
 
-## Dependencies ##
+This will emit a message like the following to the system log:
 
-Currently none; a copy of the syslog library from https://github.com/phuesler/ain is included with some inline patches to remove some extra bits that interfere with CEF.
+```
+<161> Jul 18 02:16:12 my-piano[17016] CEF:0|Steinway|Piano|B|Bflat|Out of tune|4
+```
 
+(I don't actually own a Steinway B, but I wish I did.)
+
+## Contributors
+
+- [Yvan Boily](https://github.com/ygjb/cef) wrote the initial implementation.
+
+- Patrick Huesler's [ain fork](https://github.com/phuesler/ain) provided the basis 
+  for the syslog backend.
