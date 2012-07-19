@@ -52,7 +52,7 @@ CEF requires log messages to have the following parameters:
 - *Vendor*: A string identifying your organization
 - *Product*: A string identifying your product
 - *Version*: A string identifying the version of your product
-- *Signature*: An arbitrary key identifying the type of event logged.  
+- *Signature*: An arbitrary key identifying the type of event logged.
   Typically a four-digit number.
 - *Name*: A human-readable phrase describing the event.
 - *Severity*: An integer between 0 (lowest) and 10 (highest severity)
@@ -100,7 +100,7 @@ CEF:0|Initech|Stapler|2|42|Attempted theft detected|6|suser=Milton solution=Burn
 
 CEF defines 11 levels (0 to 10, lowest to highest); syslog defines
 eight levels (7 to 0, debug to emerg).  To align these two, we declare
-CEF 11 to be equivalent to syslog `emerg` (0), CEF 10 = syslog `alert` (1),
+CEF 10 to be equivalent to syslog `emerg` (0), CEF 9 = syslog `alert` (1),
 and so on to CEF 3 = syslog `debug` (7).  We do not use CEF levels 2, 1,
 or 0.
 
@@ -115,9 +115,10 @@ The `node-cef` logger has methods named after the syslog severities:
 - `info()`
 - `debug()`
 
-We suggest you decide with your team on a set of meanings and stick
-with them.  For example, for logging BrowserID events at Mozilla, we
-use four levels as follows:
+It's up to you to decide with your team on a set of meanings and stick
+with them.  For example, for logging
+[BrowserID](https://github.com/mozilla/browserid) events at Mozilla,
+we use four levels as follows:
 
 - `emerg` (10) Completely out of whack.  Someone needs to look at
    this.  Harm to the application, user account, or system security
@@ -157,7 +158,8 @@ Within the transport function, address and port are available as
 some custom service like so:
 
 ```javascript
-{ syslog_address: '192.168.1.42',
+var config = {
+  syslog_address: '192.168.1.42',
   syslog_port: 9876,
   syslog_transport: function(message, callback) {
     myCustomService.send(
@@ -167,7 +169,7 @@ some custom service like so:
       callback
     );
   }
-}
+};
 ```
 
 ## Dependencies
