@@ -1,6 +1,6 @@
 {
   "name": "cef",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "main" : "lib/cef.js",
   "author": "Jed Parsons <https://github.com/jedp>",
   "description": "A very simple CEF-syslog module.",
