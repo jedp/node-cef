@@ -178,8 +178,7 @@ var suite = vows.describe("Formatter")
           signature: "17",
           severity: 6,
           extensions: {
-            remaining: 32,
-            failAt: "15min 42sec"
+            rt: "Jun 12 2011 11:22:33"
           }
         };
         return formatter.format(params);
@@ -188,8 +187,7 @@ var suite = vows.describe("Formatter")
       "produces a valid CEF string": function (err, result) {
         assert(!err);
         assert(result.indexOf("CEF:0|Initech|Red Stapler|2|17|Low on staples|6|") === 0);
-        assert(result.indexOf("remaining=32") !== -1);
-        assert(result.indexOf("failAt=15min 42sec") !== -1);
+        assert(result.indexOf("rt=Jun 12 2011 11:22:33") !== -1);
       }
     }
   }
