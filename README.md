@@ -66,7 +66,15 @@ CEF:<cef_version>|<vendor>|<product>|<version>|<signature>|<name>|<severity>
 ```
 
 Additionally, any number of key-value pairs specifying extra data can
-be attached.  Such key value pairs are referred to as extensions.
+be attached.  Such key value pairs are referred to as extensions.  The
+CEF standard declares some 28 extensions, and ArcSight has 462 more.
+
+The formatter ensures that extension keys belong to the set of CEF
+extensions or a subset of the ArcSight extensions.  It also verifies
+their values are of their required type (e.g., `dmac` is a valid MAC
+addr, etc.).  If you need more extensions than are permitted here,
+please submit an issue or, better yet, modify `lib/extensions.js` and
+send me a pull request.
 
 The `node-cef` logger can be instantiated with any number of default
 parameters, with the various logging methods specifying the remaining
@@ -85,7 +93,7 @@ logger.warn({
   name: "Attempted theft detected",
   extensions: {
     suser: "Milton",
-    solution: "Burn it down!"
+    msg: "Burn it down!"
   }
 });
 ```
@@ -188,3 +196,6 @@ Run `npm test` to run the test suite.  You may have to run `npm install` first.
 
 - Patrick Huesler's [ain fork](https://github.com/phuesler/ain)
   provided the initial basis for the syslog backend.
+
+- Eric Parker at Mozilla has been very helpfu in answering my
+  questions about CEF and ArcSight.
