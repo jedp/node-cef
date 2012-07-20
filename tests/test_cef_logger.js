@@ -81,7 +81,28 @@ var suite = vows.describe("Logger")
     "info":      produces("CEF:0|Steinway|Piano|B|6/8|Out of tune|4"),
     "debug":     produces("CEF:0|Steinway|Piano|B|6/8|Out of tune|3")
   }
+}).
+
+addBatch({
+  "getInstance": {
+    topic: function() {
+      var config = {
+        vendor: 'Foo',
+        product: 'Bar',
+        version: '0.1-baz'
+      };
+      return [config, cef.getInstance(config)];
+    },
+
+    "returns a singleton": function(tuple) {
+      var config = tuple[0];
+      var firstLogger = tuple[1];
+      assert(cef.getInstance(config) === firstLogger);
+      assert(cef.getInstance() !== firstLogger);
+    }
+  }
 });
+
 
 if (process.argv[1] === __filename) {
   suite.run();

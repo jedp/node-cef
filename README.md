@@ -32,7 +32,8 @@ var config = {
   syslog_facility: 'local4'
 };
 
-var logger = new cef.Logger(config);
+// Get a singleton instance for this config
+var logger = cef.getInstance(config);
 
 logger.info({signature: "Bflat", name: "Out of tune"});
 ```
