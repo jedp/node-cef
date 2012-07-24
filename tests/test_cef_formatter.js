@@ -3,32 +3,28 @@ var assert = require('assert');
 var cef = require('../lib/cef');
 var util = require('util');
 
+function handles(input, expected) {
+  var context = {
+    topic: function() {
+      return this.context.name;
+    }
+  };
+  context["works"] = function(expected) {
+    return function(err) {
+      var formatter = new cef.Formatter();
+      assert(formatter.sanitizeText(input) === expected);
+    };
+  };
+  return context;
+}
+
 var suite = vows.describe("Formatter")
 
 .addBatch({
-  "We escape": {
-    topic: function() {
-      return (new cef.Formatter()).sanitizeText("|I=flan\r|you=pie\r\n");
-    },
-
-    "pipes": function(text) {
-      assert(! /[^\\]\|/.test(text));
-    },
-
-    "equals signs": function(text) {
-      assert(! /[^\\]=/.test(text));
-    },
-
-    "backslashes": function(text) {
-      assert(! /[^\\]\\[^|=]/.test(text));
-    }
-  },
-
   "The text sanitizer": {
     topic: function() {
       var formatter = new cef.Formatter();
       var f = formatter.sanitizeText;
-      console.log("apply f: " + f("glug| merg"));
       return f(f(f("=I   | like pie = glug\r\n\r\r\n")));
     },
 
@@ -37,26 +33,59 @@ var suite = vows.describe("Formatter")
     }
   },
 
-  "The text sanitizer": {
+  "Sanitizing a null value": {
     topic: function() {
-      return (new cef.Formatter()).sanitizeText("|or else=");
+      return (new cef.Formatter()).sanitizeText(null);
     },
 
-    "works on characters at string margins": function(text) {
-      assert(text === "\\|or else\\=");
+    "yields 'null'": function(text) {
+      assert(text === 'null');
     }
   },
 
-  "We collapse various newlines": {
+  "Sanitizing an undefined value": {
     topic: function() {
-      return (new cef.Formatter()).sanitizeText("I\r\n\r\nlike\r\r\rpie");
+      var foo = {};
+      return (new cef.Formatter()).sanitizeText(foo.undefined);
     },
 
-    "to a single \n": function(text) {
-      assert(text === "I\nlike\npie");
+    "yields 'undefined'": function(text) {
+      assert(text === 'undefined');
     }
   },
 
+  "Sanitizing an object": {
+    topic: function() {
+      var obj = {"I like": "pie"};
+      return (new cef.Formatter()).sanitizeText(obj);
+    },
+
+    "yields a valid JSON string": function(text) {
+      assert(JSON.parse(text)["I like"] === "pie");
+    }
+  },
+
+  "Sanitizing a number": {
+    topic: function() {
+      return (new cef.Formatter()).sanitizeText(42);
+    },
+
+    "yields a string": function(text) {
+      assert(typeof text === 'string');
+      assert(text === "42");
+    }
+  },
+
+  "Sanitizing": {
+    "pipes": handles("eggman|walrus|", "eggman\\|walrus\\|"),
+    "equals signs": handles("2+2=4, 4+4=8", "2+2\\=4, 4+4\\=8"),
+    "backslashes": handles("C:\\blah\\blah", "C:\\\\blah\\\\blah"),
+    "special characters at string margins": handles("|or else=", "\\|or else\\="),
+    "multiple new-line characters": handles("I\r\n\r\nlike\r\r\rpie", "I\nlike\npie")
+  }
+})
+
+.addBatch({
   "We ensure keys": {
     topic: function() {
        return (new cef.Formatter()).filterKey("I= like |\r\r\npie");
