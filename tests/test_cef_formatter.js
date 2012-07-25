@@ -3,7 +3,7 @@ var assert = require('assert');
 var Formatter = require('../lib/formatter');
 var util = require('util');
 
-function yields(expected, description) {
+function filter(method, expected, description) {
   var context = {
     topic: function() {
       this.callback(null, this.context.name);
@@ -12,30 +12,25 @@ function yields(expected, description) {
 
   context["handles " + description] = function(err, input) {
     var formatter = new Formatter();
-    console.log(input + " --> " + formatter.sanitizeText(input));
-     assert(formatter.sanitizeText(input) === expected);
+     assert(formatter[method](input) === expected);
   };
   return context;
+}
+
+function prefixFilter(expected, description) {
+  return filter('sanitizePrefixField', expected, description);
+}
+
+function extensionFilter(expected, description) {
+  return filter('sanitizeExtensionValue', expected, description);
 }
 
 var suite = vows.describe("Formatter")
 
 .addBatch({
-  "The text sanitizer": {
-    topic: function() {
-      var formatter = new Formatter();
-      var f = formatter.sanitizeText;
-      return f(f(f("=I   | like \\u pie = glug\r\n\r\r\n")));
-    },
-
-    "is idempotent": function(text) {
-      assert(text === "\\=I   \\| like \\u pie \\= glug\n");
-    }
-  },
-
   "Sanitizing a null value": {
     topic: function() {
-      return (new Formatter()).sanitizeText(null);
+      return (new Formatter()).inputToString(null);
     },
 
     "yields 'null'": function(text) {
@@ -46,7 +41,7 @@ var suite = vows.describe("Formatter")
   "Sanitizing an undefined value": {
     topic: function() {
       var foo = {};
-      return (new Formatter()).sanitizeText(foo.undefined);
+      return (new Formatter()).inputToString(foo.undefined);
     },
 
     "yields 'undefined'": function(text) {
@@ -57,7 +52,7 @@ var suite = vows.describe("Formatter")
   "Sanitizing an object": {
     topic: function() {
       var obj = {"I like": "pie"};
-      return (new Formatter()).sanitizeText(obj);
+      return (new Formatter()).inputToString(obj);
     },
 
     "yields a valid JSON string": function(text) {
@@ -67,7 +62,7 @@ var suite = vows.describe("Formatter")
 
   "Sanitizing a number": {
     topic: function() {
-      return (new Formatter()).sanitizeText(42);
+      return (new Formatter()).inputToString(42);
     },
 
     "yields a string": function(text) {
@@ -76,50 +71,24 @@ var suite = vows.describe("Formatter")
     }
   },
 
-  "Sanitizing": {
-    "eggman|walrus|": yields("eggman\\|walrus\\|", "pipes"),
-    "2+2=4, 4+4=8": yields("2+2\\=4, 4+4\\=8", "equals signs"),
-//    "C:\\blah\\blah": yields("C:\\\\blah\\\\blah", "backslashes"),
-    "|or else=": yields("\\|or else\\=", "escaped characters at string margins"),
-    "I\r\n\r\nlike\r\r\rpie": yields("I\nlike\npie", "multiple newlines")
+  "Sanitizing in the prefix": {
+    "eggman|walrus|": prefixFilter("eggman\\|walrus\\|", "pipes"),
+    "C:\\blah\\blah": prefixFilter("C:\\\\blah\\\\blah", "backslashes"),
+    "2+2=4, 4+4=8": prefixFilter("2+2=4, 4+4=8", "ingorable equals signs"),
+    "|or else=": prefixFilter("\\|or else=", "escaped characters at string margins"),
+    "I\r\n\r\nlike\r\r\rpie": prefixFilter("I    like   pie", "forbidden newlines")
+  },
+
+  "Sanitizing in an extension value": {
+    "eggman|walrus|": extensionFilter("eggman|walrus|", "pipes"),
+    "C:\\blah\\blah": extensionFilter("C:\\blah\\blah", "backslashes"),
+    "2+2=4, 4+4=8": extensionFilter("2+2\\=4, 4+4\\=8", "equals signs"),
+    "|or else=": extensionFilter("|or else\\=", "escaped characters at string margins"),
+    "I\r\n\r\nlike\r\r\rpie": extensionFilter("I\n\nlike\n\n\npie", "newlines")
   }
 })
 
 .addBatch({
-  "We ensure keys": {
-    topic: function() {
-       return (new Formatter()).filterKey("I= like |\r\r\npie");
-    },
-
-    "are sanitized": function(text) {
-      assert(! /[^\\]\|/.test(text));
-    },
-
-    "have no spaces": function(text) {
-      assert (! /\s/.test(text));
-    }
-  },
-
-  "We ensure values": {
-    topic: function() {
-      return (new Formatter()).filterValue("this |must| be the place: 127.0.0.1\r\n\r\n");
-    },
-
-    "are escaped": function(text) {
-      assert(! /[^\\]\|/.test(text));
-    },
-
-    "retain their spaces": function(text) {
-      assert(/be the place/.test(text));
-    },
-
-    "have collapsed newlines": function(text) {
-      assert(!/\r/.test(text));
-      assert(/\n/.test(text));
-      assert(!/\n\n/.test(text));
-    }
-  },
-
   "The format method": {
     topic: function() {
       var config = {
@@ -207,7 +176,8 @@ var suite = vows.describe("Formatter")
           signature: "17",
           severity: 6,
           extensions: {
-            rt: "Jun 12 2011 11:22:33"
+            rt: "Jun 12 2011 11:22:33",
+            msg: "Foo=Bar"
           }
         };
         return formatter.format(params);
@@ -217,6 +187,7 @@ var suite = vows.describe("Formatter")
         assert(!err);
         assert(result.indexOf("CEF:0|Initech|Red Stapler|2|17|Low on staples|6|") === 0);
         assert(result.indexOf("rt=Jun 12 2011 11:22:33") !== -1);
+        assert(result.indexOf("msg=Foo\\=Bar") !== -1);
       }
     }
   }
