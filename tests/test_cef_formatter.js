@@ -1,19 +1,19 @@
 var vows = require('vows');
 var assert = require('assert');
-var cef = require('../lib/cef');
+var Formatter = require('../lib/formatter');
 var util = require('util');
 
-function handles(input, expected) {
+function yields(expected, description) {
   var context = {
     topic: function() {
-      return this.context.name;
+      this.callback(null, this.context.name);
     }
   };
-  context["works"] = function(expected) {
-    return function(err) {
-      var formatter = new cef.Formatter();
-      assert(formatter.sanitizeText(input) === expected);
-    };
+
+  context["handles " + description] = function(err, input) {
+    var formatter = new Formatter();
+    console.log(input + " --> " + formatter.sanitizeText(input));
+     assert(formatter.sanitizeText(input) === expected);
   };
   return context;
 }
@@ -23,19 +23,19 @@ var suite = vows.describe("Formatter")
 .addBatch({
   "The text sanitizer": {
     topic: function() {
-      var formatter = new cef.Formatter();
+      var formatter = new Formatter();
       var f = formatter.sanitizeText;
-      return f(f(f("=I   | like pie = glug\r\n\r\r\n")));
+      return f(f(f("=I   | like \\u pie = glug\r\n\r\r\n")));
     },
 
     "is idempotent": function(text) {
-      assert(text === "\\=I   \\| like pie \\= glug\n");
+      assert(text === "\\=I   \\| like \\u pie \\= glug\n");
     }
   },
 
   "Sanitizing a null value": {
     topic: function() {
-      return (new cef.Formatter()).sanitizeText(null);
+      return (new Formatter()).sanitizeText(null);
     },
 
     "yields 'null'": function(text) {
@@ -46,7 +46,7 @@ var suite = vows.describe("Formatter")
   "Sanitizing an undefined value": {
     topic: function() {
       var foo = {};
-      return (new cef.Formatter()).sanitizeText(foo.undefined);
+      return (new Formatter()).sanitizeText(foo.undefined);
     },
 
     "yields 'undefined'": function(text) {
@@ -57,7 +57,7 @@ var suite = vows.describe("Formatter")
   "Sanitizing an object": {
     topic: function() {
       var obj = {"I like": "pie"};
-      return (new cef.Formatter()).sanitizeText(obj);
+      return (new Formatter()).sanitizeText(obj);
     },
 
     "yields a valid JSON string": function(text) {
@@ -67,7 +67,7 @@ var suite = vows.describe("Formatter")
 
   "Sanitizing a number": {
     topic: function() {
-      return (new cef.Formatter()).sanitizeText(42);
+      return (new Formatter()).sanitizeText(42);
     },
 
     "yields a string": function(text) {
@@ -77,18 +77,18 @@ var suite = vows.describe("Formatter")
   },
 
   "Sanitizing": {
-    "pipes": handles("eggman|walrus|", "eggman\\|walrus\\|"),
-    "equals signs": handles("2+2=4, 4+4=8", "2+2\\=4, 4+4\\=8"),
-    "backslashes": handles("C:\\blah\\blah", "C:\\\\blah\\\\blah"),
-    "special characters at string margins": handles("|or else=", "\\|or else\\="),
-    "multiple new-line characters": handles("I\r\n\r\nlike\r\r\rpie", "I\nlike\npie")
+    "eggman|walrus|": yields("eggman\\|walrus\\|", "pipes"),
+    "2+2=4, 4+4=8": yields("2+2\\=4, 4+4\\=8", "equals signs"),
+//    "C:\\blah\\blah": yields("C:\\\\blah\\\\blah", "backslashes"),
+    "|or else=": yields("\\|or else\\=", "escaped characters at string margins"),
+    "I\r\n\r\nlike\r\r\rpie": yields("I\nlike\npie", "multiple newlines")
   }
 })
 
 .addBatch({
   "We ensure keys": {
     topic: function() {
-       return (new cef.Formatter()).filterKey("I= like |\r\r\npie");
+       return (new Formatter()).filterKey("I= like |\r\r\npie");
     },
 
     "are sanitized": function(text) {
@@ -102,7 +102,7 @@ var suite = vows.describe("Formatter")
 
   "We ensure values": {
     topic: function() {
-      return (new cef.Formatter()).filterValue("this |must| be the place: 127.0.0.1\r\n\r\n");
+      return (new Formatter()).filterValue("this |must| be the place: 127.0.0.1\r\n\r\n");
     },
 
     "are escaped": function(text) {
@@ -127,7 +127,7 @@ var suite = vows.describe("Formatter")
         product: "Red Stapler",
         version: "2"
       };
-      return new cef.Formatter(config);
+      return new Formatter(config);
     },
 
     "stores default values": function(formatter) {
