@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/jedp/node-cef.png)](http://travis-ci.org/jedp/node-cef)
 # node-cef: A CEF and Syslog Logging Library
 
 The Common Event Format, or CEF, is a [standard proposed by
