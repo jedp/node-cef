@@ -199,5 +199,10 @@ Run `npm test` to run the test suite.  You may have to run `npm install` first.
 - Patrick Huesler's [ain fork](https://github.com/phuesler/ain)
   provided the initial basis for the syslog backend.
 
-- Eric Parker at Mozilla has been very helpfu in answering my
+- Eric Parker at Mozilla has been very helpful in answering my
   questions about CEF and ArcSight.
+
+## License
+
+MPL 2.0
+
