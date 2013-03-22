@@ -101,6 +101,26 @@ addBatch({
       assert(cef.getInstance() !== firstLogger);
     }
   }
+})
+
+.addBatch({
+  "creating a logger with no config": {
+    topic: function() {
+      return new cef.logger();
+    },
+    "doesn't crash": function(logger) {
+      assert(logger);
+    }
+  },
+
+  "creating a logger with a partial config": {
+    topic: function() {
+      return new cef.logger({vendor:'Blammo'});
+    },
+    "doesn't crash": function(logger) {
+      assert(logger);
+    }
+  }
 });
 
 
