@@ -1,3 +1,5 @@
+"use strict";
+
 var vows = require('vows');
 var assert = require('assert');
 var cef = require('../lib/cef');
