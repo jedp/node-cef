@@ -21,11 +21,11 @@
   },
 
   "dependencies": {
-    "dateformat": "1.0.2-1.2.3"
+      "dateformat": "1.0.6-1.2.3"
   },
 
   "devDependencies": {
-    "vows": "0.6.2"
+    "vows": "0.7.0"
   },
 
   "scripts": {
