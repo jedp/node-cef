@@ -1,7 +1,6 @@
 var vows = require('vows');
 var assert = require('assert');
 var cef = require('../lib/cef');
-var util = require('util');
 
 // Dummy syslog transport; see test_syslog for syslog tests
 var dummyTransport = function dummyTransport(message, callback) {
@@ -121,7 +120,71 @@ addBatch({
       assert(logger);
     }
   }
+}).
+
+addBatch({
+  "creating a logger with custom err_back": {
+    topic: function() {
+        some_func = function(sample) {
+            this._capture = sample;
+        }
+      var config = {
+        vendor: 'Foo',
+        product: 'Bar',
+        version: '0.1-baz',
+        err_back: some_func
+      };
+      return cef.getInstance(config);
+    },
+
+    "will override the built in err_back": function(result) {
+      var logger = result;
+      logger.err_back('foo');
+      assert(logger._capture == 'foo');
+
+      logger.formatter.err_back('bar');
+      assert(logger.formatter._capture == 'bar');
+    }
+  }
+}).
+
+addBatch({
+  "creating a logger with custom log_factory": {
+    topic: function() {
+        some_func = function(sample) {
+            this._capture = sample;
+        }
+        custom_logfactory = function(syslog_config) {
+            var mock_syslog = {
+                log: function(message, severity) {
+                    this._transport_capture_msg = message;
+                    this._transport_capture_severity = severity;
+                }
+            }
+            return mock_syslog;
+        }
+      var config = {
+        vendor: 'Foo',
+        product: 'Bar',
+        version: '0.1-baz',
+        log_factory: custom_logfactory
+      };
+      return cef.getInstance(config);
+    },
+
+    "will use the custom log_factory instead of std syslog": function(result) {
+      var logger = result;
+      logger.info({name: "i like pancakes", signature: "5432"});
+
+      var expected_cef = "CEF:0|Foo|Bar|0.1-baz|5432|i like pancakes|4";
+      var expected_severity = 6;
+
+      assert(expected_cef === logger.syslog._transport_capture_msg);
+      assert(expected_severity === logger.syslog._transport_capture_severity);
+    }
+  }
 });
+
 
 
 if (process.argv[1] === __filename) {

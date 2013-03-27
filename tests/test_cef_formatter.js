@@ -88,6 +88,7 @@ var suite = vows.describe("Formatter")
   }
 })
 
+
 .addBatch({
   "The format method": {
     topic: function() {
@@ -191,7 +192,88 @@ var suite = vows.describe("Formatter")
       }
     }
   }
+})
+
+.addBatch({
+    "Extension formatting": {
+        topic: function() {
+          var config = {
+            vendor: "Initech",
+            product: "Red Stapler",
+            version: "2",
+            err_back: function(data, ctx) {
+                this._global_error_back_data = data;
+                this._global_error_back_ctx = ctx;
+            }
+          };
+          return new Formatter(config);
+        },
+
+        "with invalid values": {
+            topic: function(formatter) {
+                var params = {
+                  name: "Low on staples",
+                  signature: "17",
+                  severity: 6,
+                  extensions: {
+                    rt: "20130320",
+                  }
+                };
+                return [formatter, formatter.format(params)];
+            },
+
+            "does not an error": function(err, result) {
+                assert(!err);
+                var formatter = result[0];
+                var log_txt = result[1];
+
+                var err_txt = "Not a valid value for rt: 20130320";
+                assert(formatter._global_error_back_data === err_txt);
+            }
+        }
+    }
+})
+
+.addBatch({
+    "Extension formatting": {
+        topic: function() {
+          var config = {
+            vendor: "Initech",
+            product: "Red Stapler",
+            version: "2",
+            err_back: function(data, ctx) {
+                this._global_error_back_data = data;
+                this._global_error_back_ctx = ctx;
+            }
+          };
+          return new Formatter(config);
+        },
+
+        "with invalid CEF or Arcsight keys": {
+            topic: function(formatter) {
+                var params = {
+                  name: "Low on staples",
+                  signature: "17",
+                  severity: 6,
+                  extensions: {
+                    fdsart: "Jun 12 2011 11:22:33",
+                  }
+                };
+                return [formatter, formatter.format(params)];
+            },
+
+            "does not throw an error": function(err, result) {
+                assert(!err);
+                var formatter = result[0];
+                var log_txt = result[1];
+
+                var err_txt = "Not a valid CEF or ArcSight key: fdsart";
+                assert(formatter._global_error_back_data === err_txt);
+            }
+        }
+    }
 });
+
 
 if (process.argv[1] === __filename) {
   suite.run();
