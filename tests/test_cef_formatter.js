@@ -88,6 +88,7 @@ var suite = vows.describe("Formatter")
   }
 })
 
+
 .addBatch({
   "The format method": {
     topic: function() {
@@ -191,7 +192,63 @@ var suite = vows.describe("Formatter")
       }
     }
   }
+})
+
+.addBatch({
+    "Extension formatting": {
+        topic: function() {
+          var config = {
+            vendor: "Initech",
+            product: "Red Stapler",
+            version: "2"
+          };
+          return new Formatter(config);
+        },
+
+        "with invalid values": {
+            topic: function(formatter) {
+                var params = {
+                  name: "Low on staples",
+                  signature: "17",
+                  severity: 6,
+                  extensions: {
+                    rt: "20130320",
+                  }
+                };
+                return formatter.format(params);
+            },
+
+            "throws an error": function(_, err, result) {
+                assert(err);
+                assert(!result);
+                var err_txt = "Not a valid value for rt: 20130320";
+                assert(err.message === err_txt);
+            }
+        },
+
+        "with invalid CEF or Arcsight keys": {
+            topic: function(formatter) {
+                var params = {
+                  name: "Low on staples",
+                  signature: "17",
+                  severity: 6,
+                  extensions: {
+                    fdsart: "Jun 12 2011 11:22:33",
+                  }
+                };
+                return formatter.format(params);
+            },
+
+            "throws an error": function(_, err, result) {
+                assert(err);
+                assert(!result);
+                var err_txt = "Not a valid CEF or ArcSight key:";
+                assert(err.message.indexOf(err_txt) === 0);
+            }
+        }
+    }
 });
+
 
 if (process.argv[1] === __filename) {
   suite.run();
