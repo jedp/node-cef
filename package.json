@@ -25,8 +25,7 @@
   },
 
   "dependencies": {
-      "dateformat": "1.0.6-1.2.3",
-      "underscore": "1.4.2"
+      "dateformat": "1.0.6-1.2.3"
   },
 
   "devDependencies": {
