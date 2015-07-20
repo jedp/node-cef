@@ -49,7 +49,7 @@ suite.addBatch({
     "contain requestMethod":    contains(/requestMethod=\w+/),
     "contain request url":      contains(/request=\S+/),
     "contain destination host": contains(/dhost=\w+/),
-    "contain client app name":  contains(/requestContext=\w+/),
+    "contain client app name":  contains(/requestClientApplication=\w+/),
     "contain hostname":         contains(/shost=\w+/)
   }
 
